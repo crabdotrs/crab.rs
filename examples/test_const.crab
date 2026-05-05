@@ -1,0 +1,4 @@
+void main() {
+    const int X = 42;
+    print("Value: $X");
+}

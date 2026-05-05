@@ -1,0 +1,38 @@
+cli:
+  - crab.rs/crab-cli/**
+  - crab.rs/crab-cli/**/**
+
+codegen:
+  - crab.rs/crab-codegen/**
+  - crab.rs/crab-codegen/**/**
+
+core:
+  - crab.rs/crab-core/**
+  - crab.rs/crab-core/**/**
+
+parser:
+  - crab.rs/crab-parser/**
+  - crab.rs/crab-lexer/**
+
+tooling:
+  - tools/**
+  - tools/**/**
+
+scripts:
+  - scripts/**
+  - .github/workflows/**
+
+docs:
+  - docs/**
+  - README.md
+  - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
+
+examples:
+  - examples/**
+  - examples/**/**
+
+test:
+  - test_project/**
+  - '**/*.rs'
+  - '!crab.rs/**/src/**'

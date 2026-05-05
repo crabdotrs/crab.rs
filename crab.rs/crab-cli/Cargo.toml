@@ -1,0 +1,14 @@
+[package]
+name = "crab-cli"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "crab"
+path = "src/main.rs"
+
+[dependencies]
+crab-parser = { path = "../crab-parser" }
+crab-codegen = { path = "../crab-codegen" }
+crab-core = { path = "../crab-core" }
+clap = { version = "4.6.1", features = ["derive"] }

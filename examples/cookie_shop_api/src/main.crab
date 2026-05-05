@@ -1,0 +1,79 @@
+import "actix-web";
+import "./repositories/cookie_repository.crab";
+import "./repositories/order_repository.crab";
+import "./repositories/customer_repository.crab";
+import "./services/cookie_service.crab";
+import "./services/order_service.crab";
+import "./services/customer_service.crab";
+import "./routes/cookies.crab";
+import "./routes/orders.crab";
+import "./routes/customers.crab";
+import "./utils/factory.crab";
+
+Future<void> main() async {
+  var cookieRepo = MemoryCookieRepository();
+  var orderRepo = MemoryOrderRepository();
+  var customerRepo = MemoryCustomerRepository();
+
+  var cookieService = CookieService(cookieRepo);
+  var customerService = CustomerService(customerRepo);
+  var orderService = OrderService(orderRepo, cookieRepo, customerRepo);
+
+  var cookieRoutes = CookieRoutes(cookieService);
+  var customerRoutes = CustomerRoutes(customerService);
+  var orderRoutes = OrderRoutes(orderService, customerService);
+
+  seedData(cookieService, customerService);
+
+  var server = HttpServer.new()
+    .bind("127.0.0.1:8080")
+    .workers(4);
+
+  server = server.route("/", web::get().to(index));
+  server = server.route("/health", web::get().to(health));
+
+  server = server.route("/cookies", web::get().to(cookieRoutes.listCookies));
+  server = server.route("/cookies/{id}", web::get().to(cookieRoutes.getCookie));
+  server = server.route("/cookies", web::post().to(cookieRoutes.createCookie));
+  server = server.route("/cookies/{id}/restock", web::post().to(cookieRoutes.restock));
+  server = server.route("/cookies/{id}/purchase", web::post().to(cookieRoutes.purchase));
+
+  server = server.route("/customers", web::get().to(customerRoutes.listCustomers));
+  server = server.route("/customers/{id}", web::get().to(customerRoutes.getCustomer));
+  server = server.route("/customers", web::post().to(customerRoutes.createCustomer));
+  server = server.route("/customers/{id}/upgrade", web::post().to(customerRoutes.upgradeToPremium));
+  server = server.route("/customers/premium", web::get().to(customerRoutes.listPremiumCustomers));
+
+  server = server.route("/orders", web::get().to(orderRoutes.listOrders));
+  server = server.route("/orders/{id}", web::get().to(orderRoutes.getOrder));
+  server = server.route("/orders", web::post().to(orderRoutes.createOrder));
+  server = server.route("/orders/{id}/items", web::post().to(orderRoutes.addItem));
+  await server.run();
+}
+
+Future<HttpResponse> index() async {
+  return HttpResponse.ok().json({
+    "name": "Cookie Shop API",
+    "version": "1.0.0",
+    "language": "Crab"
+  });
+}
+
+Future<HttpResponse> health() async {
+  return HttpResponse.ok().json({"status": "healthy"});
+}
+
+void seedData(CookieService cookieService, CustomerService customerService) {
+  cookieService.createCookie("ck-001", "Chocolate Chip", 2.50, 100);
+  cookieService.createCookie("ck-002", "Oatmeal Raisin", 2.00, 50);
+  cookieService.createCookie("ck-003", "Sugar Cookie", 1.50, 75);
+  cookieService.createCookie("ck-004", "Gingerbread", 3.00, 40);
+  cookieService.createCookie("ck-005", "Peanut Butter", 2.75, 50);
+  cookieService.createCookie("ck-006", "Gingerbread", 2.25, 60);
+
+  customerService.createCustomer("cust-001", "Alice", "alice@example.com");
+  customerService.createCustomer("cust-002", "Bob", "bob@example.com");
+  customerService.createPremiumCustomer("cust-003", "Carol", "carol@example.com");
+
+  print("Seeded initial data: 6 cookies, 3 customers");
+}

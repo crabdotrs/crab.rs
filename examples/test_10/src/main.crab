@@ -1,0 +1,47 @@
+Result<int, String> parseNumber(String input) {
+    if (input == "42") {
+        return Ok(42);
+    } else {
+        return Err("Invalid number");
+    }
+}
+
+Option<int> findItem(List<int> items, int target) {
+    for (var item in items) {
+        if (item == target) {
+            return Some(item);
+        }
+    }
+    return None;
+}
+
+int? mightFail(bool succeed) {
+    if (succeed) {
+        return 42;
+    }
+    return null;
+}
+
+void main() {
+    var result = parseNumber("42");
+    switch (result) {
+        case Ok v => print("Parsed: $v"),
+        case Err e => print("Error: $e"),
+    }
+    
+    var items = [1, 2, 3, 4, 5];
+    var found = findItem(items, 3);
+    if (found is Some) {
+        print("Found: ${found.unwrap()}");
+    }
+    
+    var value = mightFail(true);
+    if (value != null) {
+        print("Value: $value");
+    }
+    
+    var safe = value ?? 0;
+    print("Safe: $safe");
+    
+    print("Error handling working");
+}

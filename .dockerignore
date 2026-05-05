@@ -1,0 +1,12 @@
+target/
+.crab_cache/
+.git/
+.gitignore
+*.md
+.github/
+docs/
+test_project/
+examples/
+!examples/cookie_shop_api/
+releases/
+*.sh

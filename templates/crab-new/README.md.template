@@ -1,0 +1,16 @@
+# {{PROJECT_NAME}}
+
+A project written in the Crab programming language.
+
+## Getting Started
+
+```bash
+crab build
+./target/release/{{PROJECT_NAME}}
+```
+
+## Development
+
+```bash
+crab run
+```

@@ -1,0 +1,203 @@
+import "../src/models/cookie.crab";
+import "../src/models/order.crab";
+import "../src/models/customer.crab";
+import "../src/repositories/cookie_repository.crab";
+import "../src/services/cookie_service.crab";
+import "../src/utils/factory.crab";
+import "../src/utils/builder.crab";
+
+void testCookieEncapsulation() {
+  var cookie = Cookie("1", "Test", 2.50, 100);
+
+  assert(cookie.id == "1");
+  assert(cookie.name == "Test");
+  assert(cookie.price == 2.50);
+  assert(cookie.stock == 100);
+
+  cookie.description = "A test cookie";
+  assert(cookie.description == "A test cookie");
+
+  print("PASS: Cookie encapsulation");
+}
+
+void testCookiePurchase() {
+  var cookie = Cookie("2", "Stock Test", 3.00, 10);
+
+  assert(cookie.purchase(5));
+  assert(cookie.stock == 5);
+
+  assert(!cookie.purchase(10));
+  assert(cookie.stock == 5);
+
+  print("PASS: Cookie purchase");
+}
+
+void testCookieTotalValue() {
+  var cookie = Cookie("3", "Value Test", 2.00, 50);
+  assert(cookie.totalValue == 100.00);
+
+  print("PASS: Cookie total value");
+}
+
+void testOrderStatus() {
+  var order = Order("ORD-1", "CUST-1");
+
+  assert(order.status is Pending);
+  assert(order.statusDisplay == "Pending");
+
+  order.updateStatus(Confirmed());
+  assert(order.status is Confirmed);
+  assert(order.statusDisplay == "Confirmed");
+
+  assert(!order.canCancel());
+
+  print("PASS: Order status");
+}
+
+void testOrderBuilder() {
+  var builder = OrderBuilder()
+    .orderId("ORD-2")
+    .customerId("CUST-2");
+
+  var result = builder.build();
+  assert(result is Err);
+
+  builder.addItem("CK-1", "Test", 2.50, 2);
+  result = builder.build();
+  assert(result is Ok);
+
+  print("PASS: Order builder");
+}
+
+void testCustomerInheritance() {
+  var regular = Customer("C-1", "Regular", "reg@test.com");
+  assert(regular.discountRate == 0.0);
+  assert(regular.customerType == "standard");
+
+  var premium = PremiumCustomer("C-2", "Premium", "prem@test.com");
+  assert(premium.discountRate == 0.15);
+  assert(premium.customerType == "premium");
+
+  premium.addLoyaltyPoints(500);
+  assert(premium.loyaltyPoints == 500);
+  assert(premium.tier == 0);
+
+  premium.addLoyaltyPoints(1000);
+  assert(premium.tier == 1);
+
+  print("PASS: Customer inheritance");
+}
+
+void testCookieFactory() {
+  var cc = CookieFactory.create(CookieType.ChocolateChip, "CC-1");
+  assert(cc.name == "Chocolate Chip");
+  assert(cc.price == 2.50);
+
+  var seasonal = CookieFactory.createSeasonal("S-1", "winter");
+  assert(seasonal.name == "Peppermint Bark");
+
+  var pack = CookieFactory.createAssortedPack("PACK", 3);
+  assert(pack.length == 3);
+
+  print("PASS: Cookie factory");
+}
+
+void testCustomerBuilder() {
+  var result = CustomerBuilder()
+    .id("C-3")
+    .name("Builder")
+    .email("build@test.com")
+    .premium()
+    .withLoyaltyPoints(100)
+    .build();
+
+  assert(result is Ok);
+  var customer = (result as Ok).unwrap() as Customer;
+  assert(customer is PremiumCustomer);
+  assert((customer as PremiumCustomer).loyaltyPoints == 100);
+
+  print("PASS: Customer builder");
+}
+
+void testRepositoryPattern() {
+  var repo = MemoryCookieRepository();
+
+  var cookie = Cookie("R-1", "Repo", 1.50, 20);
+  repo.save(cookie);
+
+  var found = repo.findById("R-1");
+  assert(found is Ok);
+
+  var notFound = repo.findById("MISSING");
+  assert(notFound is Err);
+
+  var all = repo.findAll();
+  assert(all.length == 1);
+
+  print("PASS: Repository pattern");
+}
+
+void testServiceLayer() {
+  var repo = MemoryCookieRepository();
+  var service = CookieService(repo);
+
+  service.createCookie("S-1", "Service", 2.00, 30);
+
+  var result = service.getCookie("S-1");
+  assert(result is Ok);
+
+  var available = service.listAvailableCookies();
+  assert(available.length == 1);
+
+  var invalid = service.createCookie("S-2", "Bad", -1.0, 10);
+  assert(invalid is Err);
+
+  print("PASS: Service layer");
+}
+
+void testSealedClassPatternMatching() {
+  OrderStatus status = Pending();
+
+  String message = switch (status) {
+    case Pending _ => "Order is pending";
+    case Confirmed _ => "Order confirmed";
+    case Shipped _ => "Order shipped";
+    case Delivered _ => "Order delivered";
+    case Cancelled _ => "Order cancelled";
+  };
+
+  assert(message == "Order is pending");
+
+  print("PASS: Sealed class pattern matching");
+}
+
+void testPolymorphism() {
+  Customer c1 = Customer("P-1", "Regular", "r@test.com");
+  Customer c2 = PremiumCustomer("P-2", "Premium", "p@test.com");
+
+  assert(c1.discountRate == 0.0);
+  assert(c2.discountRate == 0.15);
+
+  assert(c1.customerType == "standard");
+  assert(c2.customerType == "premium");
+
+  print("PASS: Polymorphism");
+}
+
+void main() {
+  testCookieEncapsulation();
+  testCookiePurchase();
+  testCookieTotalValue();
+  testOrderStatus();
+  testOrderBuilder();
+  testCustomerInheritance();
+  testCookieFactory();
+  testCustomerBuilder();
+  testRepositoryPattern();
+  testServiceLayer();
+  testSealedClassPatternMatching();
+  testPolymorphism();
+
+  print("");
+  print("All tests passed!");
+}

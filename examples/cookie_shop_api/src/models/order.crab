@@ -1,0 +1,89 @@
+import "../models/cookie.crab";
+
+sealed class OrderStatus {
+  String get name;
+}
+
+class Pending extends OrderStatus {
+  String get name => "pending";
+}
+
+class Confirmed extends OrderStatus {
+  String get name => "confirmed";
+}
+
+class Shipped extends OrderStatus {
+  String get name => "shipped";
+}
+
+class Delivered extends OrderStatus {
+  String get name => "delivered";
+}
+
+class Cancelled extends OrderStatus {
+  String get name => "cancelled";
+}
+
+class OrderItem {
+  Cookie cookie;
+  int quantity;
+  double unitPrice;
+
+  OrderItem(this.cookie, this.quantity, this.unitPrice);
+
+  double get subtotal => unitPrice * quantity;
+}
+
+class Order {
+  String _id;
+  String _customerId;
+  List<OrderItem> _items;
+  OrderStatus _status;
+  DateTime _createdAt;
+
+  Order(String id, String customerId) {
+    _id = id;
+    _customerId = customerId;
+    _items = [];
+    _status = Pending();
+    _createdAt = DateTime.now();
+  }
+
+  String get id => _id;
+  String get customerId => _customerId;
+  List<OrderItem> get items => _items;
+  OrderStatus get status => _status;
+  DateTime get createdAt => _createdAt;
+
+  void addItem(Cookie cookie, int quantity) {
+    if (cookie.purchase(quantity)) {
+      _items.add(OrderItem(cookie, quantity, cookie.price));
+    }
+  }
+
+  double get total {
+    double sum = 0.0;
+    for (var item in _items) {
+      sum += item.subtotal;
+    }
+    return sum;
+  }
+
+  void updateStatus(OrderStatus newStatus) {
+    _status = newStatus;
+  }
+
+  bool canCancel() {
+    return _status is Pending || _status is Confirmed;
+  }
+
+  String get statusDisplay {
+    switch (_status) {
+      case Pending _ => return "Pending";
+      case Confirmed _ => return "Confirmed";
+      case Shipped _ => return "Shipped";
+      case Delivered _ => return "Delivered";
+      case Cancelled _ => return "Cancelled";
+    }
+  }
+}

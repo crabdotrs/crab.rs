@@ -1,0 +1,14 @@
+class Test {
+  void test() {
+    var x = Ok(1);
+    switch (x) {
+      case Ok _ => print("ok");
+      case Err e => print("err");
+    }
+  }
+}
+
+void main() {
+  var t = Test();
+  t.test();
+}

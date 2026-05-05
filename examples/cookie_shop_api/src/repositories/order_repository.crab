@@ -1,0 +1,67 @@
+import "repository.crab";
+import "../models/order.crab";
+
+class MemoryOrderRepository extends Repository<Order> {
+  Map<String, Order> _orders;
+
+  MemoryOrderRepository() {
+    _orders = {};
+  }
+
+  @override
+  Result<Order, String> findById(String id) {
+    var order = _orders[id];
+    if (order != null) {
+      return Ok(order);
+    }
+    return Err("Order not found: $id");
+  }
+
+  @override
+  List<Order> findAll() {
+    return _orders.values.toList();
+  }
+
+  @override
+  Result<void, String> save(Order order) {
+    _orders[order.id] = order;
+    return Ok(null);
+  }
+
+  @override
+  Result<void, String> delete(String id) {
+    if (_orders.containsKey(id)) {
+      _orders.remove(id);
+      return Ok(null);
+    }
+    return Err("Order not found: $id");
+  }
+
+  List<Order> findByCustomer(String customerId) {
+    var result = [];
+    for (var order in _orders.values) {
+      if (order.customerId == customerId) {
+        result.add(order);
+      }
+    }
+    return result;
+  }
+
+  List<Order> findByStatus(OrderStatus status) {
+    var result = [];
+    for (var order in _orders.values) {
+      if (order.status == status) {
+        result.add(order);
+      }
+    }
+    return result;
+  }
+
+  double getTotalRevenue() {
+    double total = 0.0;
+    for (var order in _orders.values) {
+      total += order.total;
+    }
+    return total;
+  }
+}

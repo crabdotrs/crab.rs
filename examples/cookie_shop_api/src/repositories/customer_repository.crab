@@ -1,0 +1,59 @@
+import "repository.crab";
+import "../models/customer.crab";
+
+class MemoryCustomerRepository extends Repository<Customer> {
+  Map<String, Customer> _customers;
+
+  MemoryCustomerRepository() {
+    _customers = {};
+  }
+
+  @override
+  Result<Customer, String> findById(String id) {
+    var customer = _customers[id];
+    if (customer != null) {
+      return Ok(customer);
+    }
+    return Err("Customer not found: $id");
+  }
+
+  @override
+  List<Customer> findAll() {
+    return _customers.values.toList();
+  }
+
+  @override
+  Result<void, String> save(Customer customer) {
+    _customers[customer.id] = customer;
+    return Ok(null);
+  }
+
+  @override
+  Result<void, String> delete(String id) {
+    if (_customers.containsKey(id)) {
+      _customers.remove(id);
+      return Ok(null);
+    }
+    return Err("Customer not found: $id");
+  }
+
+  List<Customer> findByType(String type) {
+    var result = [];
+    for (var customer in _customers.values) {
+      if (customer.customerType == type) {
+        result.add(customer);
+      }
+    }
+    return result;
+  }
+
+  List<PremiumCustomer> getPremiumCustomers() {
+    var result = [];
+    for (var customer in _customers.values) {
+      if (customer is PremiumCustomer) {
+        result.add(customer);
+      }
+    }
+    return result;
+  }
+}

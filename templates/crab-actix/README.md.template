@@ -1,0 +1,24 @@
+# {{PROJECT_NAME}}
+
+An Actix-web application written in the Crab programming language.
+
+## Getting Started
+
+```bash
+crab run
+```
+
+The server will start at `http://127.0.0.1:8080`.
+
+## Endpoints
+
+- `GET /` - Welcome message
+- `GET /health` - Health check
+- `GET /api/hello/{name}` - Personalized greeting
+
+## Building for Production
+
+```bash
+crab build --release
+./target/release/{{PROJECT_NAME}}
+```

@@ -1,0 +1,9 @@
+[package]
+name = "test_minimal"
+version = "0.1.0"
+edition = "2024"
+authors = ["crabdotrs"]
+description = "Test minimal"
+license = "MIT"
+
+[dependencies]

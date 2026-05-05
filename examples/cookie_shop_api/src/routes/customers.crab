@@ -1,0 +1,88 @@
+import "actix-web";
+import "../services/customer_service.crab";
+
+class CustomerRoutes {
+  CustomerService _service;
+
+  CustomerRoutes(CustomerService service) {
+    _service = service;
+  }
+
+  Future<HttpResponse> listCustomers() async {
+    var customers = _service.listAllCustomers();
+    return HttpResponse.ok().json(customers);
+  }
+
+  Future<HttpResponse> getCustomer(String id) async {
+    var result = _service.getCustomer(id);
+    switch (result) {
+      case Ok c => {
+        var customer = c.unwrap();
+        var response = CustomerResponse(
+          customer.id,
+          customer.name,
+          customer.email,
+          customer.customerType,
+          customer.discountRate
+        );
+        return HttpResponse.ok().json(response);
+      }
+      case Err e => return HttpResponse.notFound().body(e);
+    }
+  }
+
+  Future<HttpResponse> createCustomer(web::Json<CreateCustomerRequest> req) async {
+    var result = _service.createCustomer(req.id, req.name, req.email, req.premium);
+    switch (result) {
+      case Ok _ => return HttpResponse.created().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> upgradeToPremium(String id) async {
+    var result = _service.upgradeToPremium(id);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> addLoyaltyPoints(String id, web::Json<PointsRequest> req) async {
+    var result = _service.addLoyaltyPoints(id, req.points);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> listPremiumCustomers() async {
+    var customers = _service.listPremiumCustomers();
+    return HttpResponse.ok().json(customers);
+  }
+
+  Future<HttpResponse> getPremiumCount() async {
+    var count = _service.getPremiumCustomerCount();
+    return HttpResponse.ok().json({"premium_count": count});
+  }
+}
+
+class CreateCustomerRequest {
+  String id;
+  String name;
+  String email;
+  bool premium;
+}
+
+class PointsRequest {
+  int points;
+}
+
+class CustomerResponse {
+  String id;
+  String name;
+  String email;
+  String type;
+  double discountRate;
+
+  CustomerResponse(this.id, this.name, this.email, this.type, this.discountRate);
+}

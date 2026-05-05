@@ -1,0 +1,32 @@
+Future<int> fetchData() async {
+    return 42;
+}
+
+Future<String> greetAsync(String name) async {
+    var data = await fetchData();
+    return "Hello $name, data is $data";
+}
+
+Stream<int> countStream() async* {
+    for (var i = 1; i <= 3; i++) {
+        yield i;
+    }
+}
+
+Future<void> main() async {
+    var result = await fetchData();
+    print("Fetched: $result");
+    
+    var greeting = await greetAsync("World");
+    print(greeting);
+    
+    await for (var count in countStream()) {
+        print("Count: $count");
+    }
+    
+    var futures = [fetchData(), fetchData(), fetchData()];
+    var results = await Future.wait(futures);
+    print("All results: $results");
+    
+    print("Async working");
+}

@@ -1,0 +1,29 @@
+
+[workspace]
+members = [
+  "crab-cli",
+  "crab-codegen",
+  "crab-core",
+  "crab-ffi",
+  "crab-lexer",
+  "crab-parser",
+]
+resolver = "3"
+
+
+[workspace.package]
+authors = ["crabdotrs"]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/crabdotrs/crab.rs"
+
+[workspace.dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+pest = "2.8.6"
+pest_derive = "2.8.6"
+serde = { version = "1.0.228", features = ["derive"] }
+toml = "1.1.2+spec-1.1.0"
+tokio = { version = "1.52.1", features = ["full"] }
+thiserror = "2.0.18"
+anyhow = "1.0.102"

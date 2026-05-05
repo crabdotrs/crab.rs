@@ -1,0 +1,35 @@
+void main() {
+    var single = 'Single quotes';
+    var double = "Double quotes";
+    var raw = r"Raw string \n no escape";
+    var multi = """Multi
+line
+string""";
+    
+    var name = "World";
+    var greeting = "Hello, $name!";
+    var expr = "2 + 2 = ${2 + 2}";
+    var call = "Length: ${name.length}";
+    
+    var combined = "Hello" + " " + "World";
+    var repeated = "ab" * 3;
+    
+    var text = "Hello, World!";
+    print("Length: ${text.length}");
+    print("Upper: ${text.toUpperCase()}");
+    print("Lower: ${text.toLowerCase()}");
+    print("Contains 'World': ${text.contains("World")}");
+    print("Starts with 'Hello': ${text.startsWith("Hello")}");
+    print("Ends with '!': ${text.endsWith("!")}");
+    print("Substring: ${text.substring(7, 12)}");
+    
+    var parts = "a,b,c".split(",");
+    var joined = parts.join("-");
+    
+    var spaced = "  hello  ";
+    print("Trim: '${spaced.trim()}'");
+    print("Trim left: '${spaced.trimLeft()}'");
+    print("Trim right: '${spaced.trimRight()}'");
+    
+    print("String handling working");
+}

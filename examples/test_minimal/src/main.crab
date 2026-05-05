@@ -1,0 +1,19 @@
+class Base {
+  void baseMethod() {}
+}
+
+class Child extends Base {
+  void childMethod() {
+    Result<int, String> x = Ok(1);
+    var msg = "test";
+    switch (x) {
+      case Ok _ => print("ok: $msg")
+      case Err e => print("err: $e")
+    }
+  }
+}
+
+void main() {
+  var c = Child();
+  c.childMethod();
+}

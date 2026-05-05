@@ -1,0 +1,41 @@
+class Cookie {
+  String _id;
+  String _name;
+  double _price;
+  int _stock;
+  String? _description;
+
+  Cookie(String id, String name, double price, int stock) {
+    _id = id;
+    _name = name;
+    _price = price;
+    _stock = stock;
+  }
+
+  String get id => _id;
+  String get name => _name;
+  double get price => _price;
+  int get stock => _stock;
+  String? get description => _description;
+
+  set description(String? desc) {
+    _description = desc;
+  }
+
+  void restock(int amount) {
+    _stock += amount;
+  }
+
+  bool purchase(int amount) {
+    if (_stock >= amount) {
+      _stock -= amount;
+      return true;
+    }
+    return false;
+  }
+
+  double get totalValue => _price * _stock;
+
+  @override
+  String toString() => "Cookie($_id: $_name at \$$_price)";
+}

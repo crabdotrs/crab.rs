@@ -1,0 +1,5 @@
+It has a little architectural issue well its not a big deal core is strong but i should have thought of somethings that rust has dart dont have but i think i know the solution just i'll add @annotations act like macros so right now i handled async with tokio but when theres actix web i figured it was a bad decision will take few hours to fix this but right now im tired so vision is #[tokio::main] -> @tokio.main #[actix-web::main] -> @actixWeb.main
+
+And yeah there is other problems but I belive that core looks strong
+
+NOTE: oh there is no commments in codebase and its my habit of not adding comments cause i feel like it looks ugly + i dont know how to write good comment i guess, if someone could help adding comments in code with ai it'll be helpful i dont have ai coding tool access so, also i request a specific format of the comments like on top of the file what that file do what functions is in there then on top of function what that function do not in function body however on function calls how is it called why its called etc for further questions dm me on matrix/discord

@@ -1,0 +1,12 @@
+[package]
+name = "{{PROJECT_NAME}}"
+version = "0.1.0"
+edition = "2024"
+authors = ["Your Name <you@example.com>"]
+description = "A Crab language Actix-web application"
+license = "MIT"
+
+[dependencies]
+actix-web = "4.0"
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }

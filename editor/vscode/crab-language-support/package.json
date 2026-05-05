@@ -1,0 +1,94 @@
+{
+  "name": "crab-language-support",
+  "displayName": "Crab Language Support",
+  "description": "Language Support for Crab programming language",
+  "version": "0.1.0",
+  "publisher": "crabdotrs",
+  "engines": {
+    "vscode": "^1.118.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Debuggers",
+    "Formatters",
+    "Linters"
+  ],
+  "keywords": [
+    "crab",
+    "rust",
+    "dart",
+    "language",
+    "transpiler"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "crab",
+        "aliases": [
+          "Crab",
+          "crab"
+        ],
+        "extensions": [
+          ".crab"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "crab",
+        "scopeName": "source.crab",
+        "path": "./syntaxes/crab.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "Crab",
+      "properties": {
+        "crab.languageServerPath": {
+          "type": "string",
+          "default": "crab-lsp",
+          "description": "Path to the Crab language server executable"
+        },
+        "crab.enableLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable logging for the Crab language server"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "crab.restartLanguageServer",
+        "title": "Crab: Restart Language Server"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.118.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.56.1",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "ts-loader": "^9.5.4",
+    "webpack": "^5.105.3",
+    "webpack-cli": "^6.0.1",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

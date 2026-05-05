@@ -1,0 +1,127 @@
+import "../models/order.crab";
+import "../models/cookie.crab";
+import "../models/customer.crab";
+import "../repositories/order_repository.crab";
+import "../repositories/cookie_repository.crab";
+import "../repositories/customer_repository.crab";
+
+class OrderService {
+  MemoryOrderRepository _orderRepo;
+  MemoryCookieRepository _cookieRepo;
+  MemoryCustomerRepository _customerRepo;
+
+  OrderService(MemoryOrderRepository orderRepo, MemoryCookieRepository cookieRepo, MemoryCustomerRepository customerRepo) {
+    _orderRepo = orderRepo;
+    _cookieRepo = cookieRepo;
+    _customerRepo = customerRepo;
+  }
+
+  Result<Order, String> createOrder(String orderId, String customerId) {
+    var customerResult = _customerRepo.findById(customerId);
+    switch (customerResult) {
+      case Err e => return Err("Customer not found: $customerId");
+      case Ok c => {
+        var customer = c.unwrap();
+        if (!customer.canPlaceOrder()) {
+          return Err("Customer cannot place orders");
+        }
+      }
+    }
+
+    var order = Order(orderId, customerId);
+    return _orderRepo.save(order);
+  }
+
+  Result<void, String> addItemToOrder(String orderId, String cookieId, int quantity) {
+    var orderResult = _orderRepo.findById(orderId);
+    switch (orderResult) {
+      case Err e => return Err(e);
+      case Ok o => {
+        var order = o.unwrap();
+        if (!order.canCancel()) {
+          return Err("Order cannot be modified");
+        }
+
+        var cookieResult = _cookieRepo.findById(cookieId);
+        switch (cookieResult) {
+          case Err e => return Err(e);
+          case Ok c => {
+            var cookie = c.unwrap();
+            order.addItem(cookie, quantity);
+            return _orderRepo.save(order);
+          }
+        }
+      }
+    }
+  }
+
+  Result<void, String> confirmOrder(String orderId) {
+    var result = _orderRepo.findById(orderId);
+    switch (result) {
+      case Err e => return Err(e);
+      case Ok o => {
+        var order = o.unwrap();
+        order.updateStatus(Confirmed());
+        return _orderRepo.save(order);
+      }
+    }
+  }
+
+  Result<void, String> shipOrder(String orderId) {
+    var result = _orderRepo.findById(orderId);
+    switch (result) {
+      case Err e => return Err(e);
+      case Ok o => {
+        var order = o.unwrap();
+        if (order.status is Confirmed) {
+          order.updateStatus(Shipped());
+          return _orderRepo.save(order);
+        }
+        return Err("Order must be confirmed before shipping");
+      }
+    }
+  }
+
+  Result<void, String> cancelOrder(String orderId) {
+    var result = _orderRepo.findById(orderId);
+    switch (result) {
+      case Err e => return Err(e);
+      case Ok o => {
+        var order = o.unwrap();
+        if (order.canCancel()) {
+          order.updateStatus(Cancelled());
+          return _orderRepo.save(order);
+        }
+        return Err("Order cannot be cancelled at this stage");
+      }
+    }
+  }
+
+  double calculateTotal(String orderId) {
+    var result = _orderRepo.findById(orderId);
+    switch (result) {
+      case Err _ => return 0.0;
+      case Ok o => {
+        var order = o.unwrap();
+        var total = order.total;
+
+        var customerResult = _customerRepo.findById(order.customerId);
+        switch (customerResult) {
+          case Err _ => return total;
+          case Ok c => {
+            var customer = c.unwrap();
+            return total * (1.0 - customer.discountRate);
+          }
+        }
+      }
+    }
+  }
+
+  List<Order> getCustomerOrders(String customerId) {
+    return _orderRepo.findByCustomer(customerId);
+  }
+
+  double getTotalRevenue() {
+    return _orderRepo.getTotalRevenue();
+  }
+}

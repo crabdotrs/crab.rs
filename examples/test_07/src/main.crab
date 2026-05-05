@@ -1,0 +1,38 @@
+class Box<T> {
+    T value;
+    
+    Box(this.value);
+    
+    T get() => value;
+    void set(T newValue) {
+        value = newValue;
+    }
+}
+
+class Pair<A, B> {
+    A first;
+    B second;
+    
+    Pair(this.first, this.second);
+}
+
+T first<T>(List<T> list) {
+    return list[0];
+}
+
+void main() {
+    var intBox = Box<int>(42);
+    print(intBox.get());
+    
+    var stringBox = Box<String>("hello");
+    print(stringBox.get());
+    
+    var pair = Pair<String, int>("age", 25);
+    print("${pair.first}: ${pair.second}");
+    
+    var items = [1, 2, 3];
+    var firstItem = first(items);
+    print("First: $firstItem");
+    
+    print("Generics working");
+}

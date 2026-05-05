@@ -1,0 +1,6 @@
+abstract class Repository<T> {
+  Result<T, String> findById(String id);
+  List<T> findAll();
+  Result<void, String> save(T item);
+  Result<void, String> delete(String id);
+}

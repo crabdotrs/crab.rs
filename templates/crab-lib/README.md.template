@@ -1,0 +1,26 @@
+# {{PROJECT_NAME}}
+
+A library written in the Crab programming language.
+
+## Usage
+
+```crab
+import "{{PROJECT_NAME}}";
+
+void main() {
+  var result = add(2, 3);
+  print(result); // 5
+
+  var calc = Calculator(10);
+  calc.add(5);
+  print(calc.value); // 15
+}
+```
+
+## Building
+
+```bash
+crab build
+```
+
+The library will be available in `target/release/lib{{PROJECT_NAME}}.rlib`.

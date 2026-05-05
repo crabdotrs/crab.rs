@@ -1,0 +1,111 @@
+import "actix-web";
+import "../services/order_service.crab";
+import "../services/customer_service.crab";
+
+class OrderRoutes {
+  OrderService _orderService;
+  CustomerService _customerService;
+
+  OrderRoutes(OrderService orderService, CustomerService customerService) {
+    _orderService = orderService;
+    _customerService = customerService;
+  }
+
+  Future<HttpResponse> listOrders() async {
+    var orders = _orderService._orderRepo.findAll();
+    return HttpResponse.ok().json(orders);
+  }
+
+  Future<HttpResponse> getOrder(String id) async {
+    var result = _orderService._orderRepo.findById(id);
+    switch (result) {
+      case Ok o => {
+        var order = o.unwrap();
+        var response = OrderResponse(
+          order.id,
+          order.customerId,
+          order.statusDisplay,
+          order.total,
+          order.items.length
+        );
+        return HttpResponse.ok().json(response);
+      }
+      case Err e => return HttpResponse.notFound().body(e);
+    }
+  }
+
+  Future<HttpResponse> createOrder(web::Json<CreateOrderRequest> req) async {
+    var result = _orderService.createOrder(req.orderId, req.customerId);
+    switch (result) {
+      case Ok _ => return HttpResponse.created().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> addItem(String orderId, web::Json<AddItemRequest> req) async {
+    var result = _orderService.addItemToOrder(orderId, req.cookieId, req.quantity);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> confirmOrder(String id) async {
+    var result = _orderService.confirmOrder(id);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> shipOrder(String id) async {
+    var result = _orderService.shipOrder(id);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> cancelOrder(String id) async {
+    var result = _orderService.cancelOrder(id);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> getTotal(String id) async {
+    var total = _orderService.calculateTotal(id);
+    return HttpResponse.ok().json({"total": total});
+  }
+
+  Future<HttpResponse> getCustomerOrders(String customerId) async {
+    var orders = _orderService.getCustomerOrders(customerId);
+    return HttpResponse.ok().json(orders);
+  }
+
+  Future<HttpResponse> getRevenue() async {
+    var revenue = _orderService.getTotalRevenue();
+    return HttpResponse.ok().json({"revenue": revenue});
+  }
+}
+
+class CreateOrderRequest {
+  String orderId;
+  String customerId;
+}
+
+class AddItemRequest {
+  String cookieId;
+  int quantity;
+}
+
+class OrderResponse {
+  String id;
+  String customerId;
+  String status;
+  double total;
+  int itemCount;
+
+  OrderResponse(this.id, this.customerId, this.status, this.total, this.itemCount);
+}

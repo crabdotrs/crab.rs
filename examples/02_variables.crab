@@ -1,0 +1,16 @@
+void main() {
+    var x = 10;
+    int y = 20;
+    final z = 30;
+    const double PI = 3.14;
+    
+    var a = 1;
+    var b = 2;
+    var c = 3;
+    
+    var name = "Crab";
+    var flag = true;
+    var price = 19.99;
+    
+    print("Variables working");
+}

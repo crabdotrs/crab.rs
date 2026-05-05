@@ -1,0 +1,39 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  deployments: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install cargo-criterion
+        uses: taiki-e/install-action@cargo-criterion
+
+      - name: Build benchmarks
+        run: cd crab.rs && cargo build --benches --workspace
+
+      - name: Run benchmarks
+        run: cd crab.rs && cargo criterion --workspace || true
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: crab.rs/target/criterion

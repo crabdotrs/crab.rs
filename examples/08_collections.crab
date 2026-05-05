@@ -1,0 +1,25 @@
+void main() {
+    List<int> numbers = [1, 2, 3, 4, 5];
+    numbers.add(6);
+    
+    Map<String, int> scores = {"Alice": 100, "Bob": 85};
+    scores["Charlie"] = 90;
+    
+    Set<String> tags = {"rust", "dart"};
+    tags.add("crab");
+    
+    var doubled = numbers.map((n) => n * 2);
+    var evens = numbers.filter((n) => n % 2 == 0);
+    
+    var more = [...numbers, 7, 8, 9];
+    var combined = {...scores, "Dave": 95};
+    
+    var generated = [for (var i in 0..5) i * 2];
+    var filtered = [for (var n in numbers) if (n > 2) n];
+    
+    print("List length: ${numbers.length}");
+    print("Map keys: ${scores.keys}");
+    print("Set contains 'rust': ${tags.contains("rust")}");
+    
+    print("Collections working");
+}

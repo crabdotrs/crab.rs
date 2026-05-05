@@ -1,0 +1,7 @@
+void main() {
+    var x = 10;
+    var name = "Crab";
+    var flag = true;
+    print("x = ${x}");
+    print("name = ${name}");
+}

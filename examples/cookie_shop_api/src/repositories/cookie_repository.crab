@@ -1,0 +1,59 @@
+import "repository.crab";
+import "../models/cookie.crab";
+
+class MemoryCookieRepository extends Repository<Cookie> {
+  Map<String, Cookie> _cookies;
+
+  MemoryCookieRepository() {
+    _cookies = {};
+  }
+
+  @override
+  Result<Cookie, String> findById(String id) {
+    var cookie = _cookies[id];
+    if (cookie != null) {
+      return Ok(cookie);
+    }
+    return Err("Cookie not found: $id");
+  }
+
+  @override
+  List<Cookie> findAll() {
+    return _cookies.values.toList();
+  }
+
+  @override
+  Result<void, String> save(Cookie cookie) {
+    _cookies[cookie.id] = cookie;
+    return Ok(null);
+  }
+
+  @override
+  Result<void, String> delete(String id) {
+    if (_cookies.containsKey(id)) {
+      _cookies.remove(id);
+      return Ok(null);
+    }
+    return Err("Cookie not found: $id");
+  }
+
+  List<Cookie> findByPriceRange(double min, double max) {
+    var result = [];
+    for (var cookie in _cookies.values) {
+      if (cookie.price >= min && cookie.price <= max) {
+        result.add(cookie);
+      }
+    }
+    return result;
+  }
+
+  List<Cookie> findInStock() {
+    var result = [];
+    for (var cookie in _cookies.values) {
+      if (cookie.stock > 0) {
+        result.add(cookie);
+      }
+    }
+    return result;
+  }
+}

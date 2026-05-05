@@ -1,0 +1,25 @@
+pub mod new;
+pub mod build;
+pub mod run;
+pub mod test;
+pub mod fmt;
+pub mod lint;
+pub mod check;
+pub mod clean;
+pub mod add;
+pub mod remove;
+pub mod doc;
+pub mod publish;
+
+pub use new::cmd_new;
+pub use build::cmd_build;
+pub use run::cmd_run;
+pub use test::cmd_test;
+pub use fmt::cmd_fmt;
+pub use lint::cmd_lint;
+pub use check::cmd_check;
+pub use clean::cmd_clean;
+pub use add::cmd_add;
+pub use remove::cmd_remove;
+pub use doc::cmd_doc;
+pub use publish::cmd_publish;

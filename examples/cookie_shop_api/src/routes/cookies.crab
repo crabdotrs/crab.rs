@@ -1,0 +1,72 @@
+import "actix-web";
+import "../services/cookie_service.crab";
+
+class CookieRoutes {
+  CookieService _service;
+
+  CookieRoutes(CookieService service) {
+    _service = service;
+  }
+
+  Future<HttpResponse> listCookies() async {
+    var cookies = _service.listAllCookies();
+    return HttpResponse.ok().json(cookies);
+  }
+
+  Future<HttpResponse> getCookie(String id) async {
+    var result = _service.getCookie(id);
+    switch (result) {
+      case Ok c => return HttpResponse.ok().json(c.unwrap());
+      case Err e => return HttpResponse.notFound().body(e);
+    }
+  }
+
+  Future<HttpResponse> createCookie(web::Json<CookieRequest> req) async {
+    var result = _service.createCookie(
+      req.id,
+      req.name,
+      req.price,
+      req.stock
+    );
+    switch (result) {
+      case Ok _ => return HttpResponse.created().finish();
+      case Err e => return HttpResponse.badRequest().body(e);
+    }
+  }
+
+  Future<HttpResponse> restock(String id, web::Json<RestockRequest> req) async {
+    var result = _service.restockCookie(id, req.amount);
+    switch (result) {
+      case Ok _ => return HttpResponse.ok().finish();
+      case Err e => return HttpResponse.notFound().body(e);
+    }
+  }
+
+  Future<HttpResponse> purchase(String id, web::Json<PurchaseRequest> req) async {
+    var result = _service.purchaseCookie(id, req.amount);
+    switch (result) {
+      case Ok success => {
+        if (success) {
+          return HttpResponse.ok().finish();
+        }
+        return HttpResponse.badRequest().body("Insufficient stock");
+      }
+      case Err e => return HttpResponse.notFound().body(e);
+    }
+  }
+}
+
+class CookieRequest {
+  String id;
+  String name;
+  double price;
+  int stock;
+}
+
+class RestockRequest {
+  int amount;
+}
+
+class PurchaseRequest {
+  int amount;
+}

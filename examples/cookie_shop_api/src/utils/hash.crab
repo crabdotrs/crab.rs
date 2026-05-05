@@ -1,0 +1,48 @@
+CBlock {
+  #include <stdint.h>
+  #include <string.h>
+
+  uint64_t simple_hash(const char* str) {
+    uint64_t hash = 5381;
+    int c;
+
+    while ((c = *str++)) {
+      hash = ((hash << 5) + hash) + c;
+    }
+
+    return hash;
+  }
+
+  uint64_t djb2_hash(const char* str) {
+    uint64_t hash = 5381;
+    int c;
+
+    while ((c = *str++)) {
+      hash = ((hash << 5) + hash) + c;
+    }
+
+    return hash;
+  }
+}
+
+class HashUtil {
+  static uint64_t hashString(String input) {
+    return simple_hash(input);
+  }
+
+  static uint64_t hashDjb2(String input) {
+    return djb2_hash(input);
+  }
+
+  static String generateOrderId(String customerId, int sequence) {
+    var base = "$customerId-$sequence";
+    var hash = simple_hash(base);
+    return "ORD-${hash.toString().substring(0, 8)}";
+  }
+
+  static String generateCookieId(String name, double price) {
+    var base = "$name-$price";
+    var hash = djb2_hash(base);
+    return "CK-${hash.toString().substring(0, 6)}";
+  }
+}

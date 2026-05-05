@@ -1,0 +1,33 @@
+int add(int a, int b) {
+    return a + b;
+}
+
+void greet(String name) {
+    print("Hello, $name!");
+}
+
+String greetExpr(String name) => "Hello, $name!";
+
+int sum(int a, int b, [int c = 0]) {
+    return a + b + c;
+}
+
+String format(String template, {required String value, String suffix = ""}) {
+    return "$template$value$suffix";
+}
+
+void apply(int x, int Function(int) f) {
+    print(f(x));
+}
+
+void main() {
+    var result = add(1, 2);
+    greet("World");
+    var msg = greetExpr("Crab");
+    var total = sum(1, 2, 3);
+    var formatted = format("Value: ", value: "test", suffix: "!");
+    
+    apply(5, (x) => x * 2);
+    
+    print("Functions working");
+}

@@ -1,0 +1,62 @@
+class Person {
+    String name;
+    int age;
+    
+    Person(this.name, this.age);
+    
+    String greet() => "Hello, I'm $name";
+}
+
+class Employee extends Person {
+    String department;
+    
+    Employee(String name, int age, this.department) : super(name, age);
+    
+    @override
+    String greet() => "${super.greet()} from $department";
+}
+
+abstract class Shape {
+    abstract double area();
+}
+
+class Circle extends Shape {
+    double radius;
+    
+    Circle(this.radius);
+    
+    @override
+    double area() => 3.14 * radius * radius;
+}
+
+sealed class Result {
+}
+
+class Success extends Result {
+    String data;
+    Success(this.data);
+}
+
+class Error extends Result {
+    String message;
+    Error(this.message);
+}
+
+void main() {
+    var person = Person("Alice", 30);
+    print(person.greet());
+    
+    var emp = Employee("Bob", 25, "Engineering");
+    print(emp.greet());
+    
+    var circle = Circle(5.0);
+    print("Area: ${circle.area()}");
+    
+    Result result = Success("Data");
+    switch (result) {
+        case Success s => print(s.data),
+        case Error e => print(e.message),
+    }
+    
+    print("Classes working");
+}

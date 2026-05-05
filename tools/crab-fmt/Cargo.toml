@@ -1,0 +1,14 @@
+[package]
+name = "crab-fmt"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+anyhow = "1.0.102"
+
+[dependencies.crab-parser]
+path = "../../crab.rs/crab-parser"
+
+[dependencies.crab-lexer]
+path = "../../crab.rs/crab-lexer"

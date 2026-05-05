@@ -1,0 +1,9 @@
+[package]
+name = "todo_list"
+version = "0.1.0"
+edition = "2024"
+authors = ["crabdotrs"]
+description = "A command-line todo list application"
+license = "MIT"
+
+[dependencies]

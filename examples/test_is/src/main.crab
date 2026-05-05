@@ -1,0 +1,6 @@
+void main() {
+    var status = "pending";
+    if (status is String) {
+        print("Is string!");
+    }
+}

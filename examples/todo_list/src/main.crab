@@ -1,0 +1,388 @@
+import "std::fs";
+import "std::io";
+import "serde";
+import "serde_json";
+
+class Task {
+  String _id;
+  String _title;
+  bool _completed;
+  int _priority;
+  DateTime _createdAt;
+
+  Task(String id, String title, int priority) {
+    _id = id;
+    _title = title;
+    _completed = false;
+    _priority = priority;
+    _createdAt = DateTime.now();
+  }
+
+  String get id => _id;
+  String get title => _title;
+  bool get completed => _completed;
+  int get priority => _priority;
+  DateTime get createdAt => _createdAt;
+
+  set title(String value) {
+    _title = value;
+  }
+
+  set priority(int value) {
+    _priority = value;
+  }
+
+  void markComplete() {
+    _completed = true;
+  }
+
+  void markIncomplete() {
+    _completed = false;
+  }
+
+  String toJson() {
+    return '{"id":"$_id","title":"$_title","completed":$_completed,"priority":$_priority}';
+  }
+
+  @override
+  String toString() {
+    var status = _completed ? "[X]" : "[ ]";
+    var priorityMarker = _priority > 5 ? "!" : "";
+    return "$status $priorityMarker $_title (id: $_id)";
+  }
+}
+
+class TaskRepository {
+  List<Task> _tasks;
+  String _storagePath;
+
+  TaskRepository(String storagePath) {
+    _tasks = [];
+    _storagePath = storagePath;
+    _loadFromDisk();
+  }
+
+  Result<Task, String> add(Task task) {
+    var taskId = task.id;
+    if (_findById(taskId) != null) {
+      return Err("Task with id ${taskId} already exists");
+    }
+    _tasks.push(task);
+    _saveToDisk();
+    var added = _findById(taskId);
+    if (added == null) {
+      return Err("Failed to add task");
+    }
+    return Ok(added);
+  }
+
+  Result<Task, String> complete(String id) {
+    var task = _findById(id);
+    if (task == null) {
+      return Err("Task not found: $id");
+    }
+    task.markComplete();
+    _saveToDisk();
+    return Ok(task);
+  }
+
+  Result<Task, String> uncomplete(String id) {
+    var task = _findById(id);
+    if (task == null) {
+      return Err("Task not found: $id");
+    }
+    task.markIncomplete();
+    _saveToDisk();
+    return Ok(task);
+  }
+
+  Result<void, String> remove(String id) {
+    var initialLength = _tasks.length;
+    _tasks.removeWhere((t) => t.id == id);
+    if (_tasks.length == initialLength) {
+      return Err("Task not found: $id");
+    }
+    _saveToDisk();
+    return Ok(null);
+  }
+
+  List<Task> listAll() {
+    return List.from(_tasks);
+  }
+
+  List<Task> listPending() {
+    return _tasks.clone();
+  }
+
+  List<Task> listCompleted() {
+    return _tasks.clone();
+  }
+
+  List<Task> listByPriority() {
+    return _tasks.clone();
+  }
+
+  void clearCompleted() {
+    _tasks.removeWhere((t) => t.completed);
+    _saveToDisk();
+  }
+
+  int get count => _tasks.length;
+  int get pendingCount => listPending().length;
+
+  Task? _findById(String id) {
+    for (var task in _tasks) {
+      if (task.id == id) {
+        return task;
+      }
+    }
+    return null;
+  }
+
+  void _saveToDisk() {
+    var jsonList = _tasks.map((t) => t.toJson()).toList();
+    var json = '[${jsonList.join(",")}]';
+    fs.writeFile(_storagePath, json);
+  }
+
+  void _loadFromDisk() {
+    try {
+      var json = fs.readFile(_storagePath);
+      var parsed = serde_json.fromString(json);
+      if (parsed is List) {
+        for (var item in parsed) {
+          if (item is Map) {
+            var task = Task(
+              item['id'] as String,
+              item['title'] as String,
+              item['priority'] as int
+            );
+            if (item['completed'] == true) {
+              task.markComplete();
+            }
+            _tasks.push(task);
+          }
+        }
+      }
+    } catch (e) {
+      _tasks = [];
+    }
+  }
+}
+
+sealed class Command {
+  void execute(TaskRepository repo);
+}
+
+class AddCommand extends Command {
+  String title;
+  int priority;
+
+  AddCommand(this.title, this.priority);
+
+  @override
+  void execute(TaskRepository repo) {
+    var id = "task_${DateTime.now().millisecondsSinceEpoch}";
+    var idClone = id.clone();
+    var task = Task(id, title.clone(), priority);
+    var result = repo.add(task);
+    switch (result) {
+      case Ok _ => print("Added: ${idClone}")
+      case Err e => print("Error: $e")
+    }
+    print("Done");
+  }
+}
+
+class ListCommand extends Command {
+  String filter;
+
+  ListCommand(this.filter);
+
+  @override
+  void execute(TaskRepository repo) {
+    List<Task> tasks;
+    switch (filter) {
+      case "pending" => tasks = repo.listPending()
+      case "completed" => tasks = repo.listCompleted()
+      case "priority" => tasks = repo.listByPriority()
+      default => tasks = repo.listAll()
+    }
+
+    if (tasks.isEmpty) {
+      print("No tasks found.");
+      return;
+    }
+
+    print("Tasks (${tasks.length} total, ${repo.pendingCount} pending):");
+    print("-" * 50);
+    for (var task in tasks) {
+      print(task);
+    }
+  }
+}
+
+class CompleteCommand extends Command {
+  String taskId;
+
+  CompleteCommand(this.taskId);
+
+  @override
+  void execute(TaskRepository repo) {
+    var id = taskId.clone();
+    var result = repo.complete(id);
+    switch (result) {
+      case Ok task => print("Completed: ${task.title}")
+      case Err e => print("Error: $e")
+    }
+  }
+}
+
+class UncompleteCommand extends Command {
+  String taskId;
+
+  UncompleteCommand(this.taskId);
+
+  @override
+  void execute(TaskRepository repo) {
+    var id = taskId.clone();
+    var result = repo.uncomplete(id);
+    switch (result) {
+      case Ok task => print("Reopened: ${task.title}")
+      case Err e => print("Error: $e")
+    }
+  }
+}
+
+class RemoveCommand extends Command {
+  String taskId;
+
+  RemoveCommand(this.taskId);
+
+  @override
+  void execute(TaskRepository repo) {
+    var id = taskId.clone();
+    var result = repo.remove(id.clone());
+    switch (result) {
+      case Ok _ => print("Removed: $id")
+      case Err e => print("Error: $e")
+    }
+  }
+}
+
+class ClearCommand extends Command {
+  @override
+  void execute(TaskRepository repo) {
+    repo.clearCompleted();
+    print("Cleared all completed tasks.");
+  }
+}
+
+class StatsCommand extends Command {
+  @override
+  void execute(TaskRepository repo) {
+    print("Todo List Statistics:");
+    print("  Total tasks: ${repo.count}");
+    print("  Pending: ${repo.pendingCount}");
+    print("  Completed: ${repo.count - repo.pendingCount}");
+  }
+}
+
+Command? parseArguments(List<String> args) {
+  if (args.isEmpty) {
+    return ListCommand("all");
+  }
+
+  var command = args[0];
+
+  switch (command) {
+    case "add" => {
+      if (args.length < 2) {
+        print("Usage: todo add <title> [priority]");
+        return null;
+      }
+      var title = args[1];
+      var priority = 1;
+      if (args.length >= 3) {
+        priority = int.parse(args[2]) ?? 1;
+      }
+      return AddCommand(title, priority);
+    }
+    case "list" => {
+      String filter = "all";
+      if (args.length >= 2) {
+        filter = args[1];
+      }
+      return ListCommand(filter);
+    }
+    case "done" => {
+      if (args.length < 2) {
+        print("Usage: todo done <task-id>");
+        return null;
+      }
+      return CompleteCommand(args[1]);
+    }
+    case "undo" => {
+      if (args.length < 2) {
+        print("Usage: todo undo <task-id>");
+        return null;
+      }
+      return UncompleteCommand(args[1]);
+    }
+    case "remove" => {
+      if (args.length < 2) {
+        print("Usage: todo remove <task-id>");
+        return null;
+      }
+      return RemoveCommand(args[1]);
+    }
+    case "clear" => {
+      return ClearCommand();
+    }
+    case "stats" => {
+      return StatsCommand();
+    }
+    default => {
+      print("Unknown command: $command");
+      print("");
+      printUsage();
+      return null;
+    }
+  }
+}
+
+void printUsage() {
+  print("Todo List CLI");
+  print("");
+  print("Usage: todo <command> [args]");
+  print("");
+  print("Commands:");
+  print("  add <title> [priority]     Add a new task (priority 1-10, default 1)");
+  print("  list [filter]            List tasks (all, pending, completed, priority)");
+  print("  done <task-id>           Mark a task as completed");
+  print("  undo <task-id>           Mark a task as not completed");
+  print("  remove <task-id>         Delete a task permanently");
+  print("  clear                    Remove all completed tasks");
+  print("  stats                    Show task statistics");
+  print("");
+  print("Examples:");
+  print("  todo add \"Buy groceries\" 5");
+  print("  todo list pending");
+  print("  todo done task_123456");
+}
+
+Future<void> main(List<String> args) async {
+  var home = io.getEnv("HOME") ?? ".";
+  var storagePath = "$home/.todo_list.json";
+  var repo = TaskRepository(storagePath);
+
+  if (args.isEmpty) {
+    printUsage();
+    return;
+  }
+
+  var command = parseArguments(args);
+  if (command != null) {
+    command.execute(repo);
+  }
+}

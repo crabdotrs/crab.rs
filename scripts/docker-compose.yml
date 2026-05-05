@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  crab:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: crab:latest
+    container_name: crab-dev
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=debug
+      - RUST_BACKTRACE=1
+    command: ["--help"]
+
+  crab-shell:
+    extends: crab
+    container_name: crab-shell
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true

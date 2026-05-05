@@ -1,0 +1,65 @@
+import "../models/cookie.crab";
+import "../repositories/cookie_repository.crab";
+
+class CookieService {
+  MemoryCookieRepository _repository;
+
+  CookieService(MemoryCookieRepository repository) {
+    _repository = repository;
+  }
+
+  Result<Cookie, String> createCookie(String id, String name, double price, int stock) {
+    if (price <= 0) {
+      return Err("Price must be positive");
+    }
+    if (stock < 0) {
+      return Err("Stock cannot be negative");
+    }
+
+    var cookie = Cookie(id, name, price, stock);
+    return _repository.save(cookie);
+  }
+
+  Result<Cookie, String> getCookie(String id) {
+    return _repository.findById(id);
+  }
+
+  List<Cookie> listAllCookies() {
+    return _repository.findAll();
+  }
+
+  List<Cookie> listAvailableCookies() {
+    return _repository.findInStock();
+  }
+
+  Result<void, String> restockCookie(String id, int amount) {
+    var result = _repository.findById(id);
+    switch (result) {
+      case Ok v => {
+        var cookie = v.unwrap();
+        cookie.restock(amount);
+        return _repository.save(cookie);
+      }
+      case Err e => return Err(e);
+    }
+  }
+
+  Result<bool, String> purchaseCookie(String id, int amount) {
+    var result = _repository.findById(id);
+    switch (result) {
+      case Ok v => {
+        var cookie = v.unwrap();
+        return Ok(cookie.purchase(amount));
+      }
+      case Err e => return Err(e);
+    }
+  }
+
+  double getInventoryValue() {
+    double total = 0.0;
+    for (var cookie in _repository.findAll()) {
+      total += cookie.totalValue;
+    }
+    return total;
+  }
+}

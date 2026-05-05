@@ -1,0 +1,20 @@
+language: en
+reviews:
+  profile: "chill"
+  path_filters:
+    - "!target/**"
+    - "!**/*.lock"
+    - "!vendor/**"
+    - "!dist/**"
+    - "!node_modules/**"
+    - "!.git/**"
+  auto_review:
+    enabled: true
+    base_branches: ["main", "develop", "release/*"]
+    drafts: false
+  poem: false
+  high_level_summary: true
+  review_status: true
+chat:
+  auto_reply: true
+early_access: false

@@ -1,0 +1,18 @@
+class Task {
+  String _id;
+  Task(String id) { _id = id; }
+  String get id => _id;
+  
+  void test() {
+    Result<int, String> x = Ok(1);
+    switch (x) {
+      case Ok _ => print("ok");
+      case Err e => print("err");
+    }
+  }
+}
+
+void main() {
+  var task = Task("123");
+  task.test();
+}

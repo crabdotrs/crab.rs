@@ -1,0 +1,9 @@
+[package]
+name = "cookie_shop_api"
+version = "0.1.0"
+edition = "2024"
+authors = ["crabdotrs"]
+description = "Cookie Shop REST API"
+license = "MIT"
+
+[dependencies]

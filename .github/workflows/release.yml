@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: false
+          generate_release_notes: true
+
+  build-binaries:
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        run: cd crab.rs && cargo build --release --target ${{ matrix.target }} -p crab-cli
+
+      - name: Package (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd crab.rs/target/${{ matrix.target }}/release
+          tar czf ../../../crab-${{ matrix.target }}.tar.gz crab
+          cd ../../..
+
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd crab.rs\target\${{ matrix.target }}\release
+          7z a ..\..\..\crab-${{ matrix.target }}.zip crab.exe
+          cd ..\..\..
+
+      - name: Upload (Unix)
+        if: matrix.os != 'windows-latest'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: crab/crab-*.tar.gz
+
+      - name: Upload (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: crab/crab-*.zip

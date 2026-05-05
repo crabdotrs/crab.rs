@@ -1,0 +1,66 @@
+import "../models/cookie.crab";
+
+enum CookieType {
+  ChocolateChip,
+  OatmealRaisin,
+  Sugar,
+  PeanutButter,
+  Gingerbread
+}
+
+class CookieFactory {
+  static Cookie create(CookieType type, String id) {
+    switch (type) {
+      case CookieType.ChocolateChip => {
+        return Cookie(id, "Chocolate Chip", 2.50, 100);
+      }
+      case CookieType.OatmealRaisin => {
+        return Cookie(id, "Oatmeal Raisin", 2.00, 75);
+      }
+      case CookieType.Sugar => {
+        return Cookie(id, "Sugar Cookie", 1.50, 150);
+      }
+      case CookieType.PeanutButter => {
+        return Cookie(id, "Peanut Butter", 2.75, 50);
+      }
+      case CookieType.Gingerbread => {
+        return Cookie(id, "Gingerbread", 2.25, 60);
+      }
+    }
+  }
+
+  static Cookie createPremium(String id, String name, double basePrice) {
+    var cookie = Cookie(id, name, basePrice * 1.5, 25);
+    cookie.description = "Premium artisan cookie";
+    return cookie;
+  }
+
+  static Cookie createSeasonal(String id, String season) {
+    switch (season) {
+      case "winter" => return Cookie(id, "Peppermint Bark", 3.00, 40);
+      case "spring" => return Cookie(id, "Lemon Lavender", 2.80, 45);
+      case "summer" => return Cookie(id, "S'mores", 2.60, 55);
+      case "fall" => return Cookie(id, "Pumpkin Spice", 2.90, 65);
+      default => return Cookie(id, "Classic Sugar", 1.50, 100);
+    }
+  }
+
+  static List<Cookie> createAssortedPack(String baseId, int count) {
+    var pack = [];
+    var types = [
+      CookieType.ChocolateChip,
+      CookieType.OatmealRaisin,
+      CookieType.Sugar,
+      CookieType.PeanutButter,
+      CookieType.Gingerbread
+    ];
+
+    for (int i = 0; i < count; i = i + 1) {
+      var typeIndex = i % types.length;
+      var cookieId = "$baseId-$i";
+      pack.add(create(types[typeIndex], cookieId));
+    }
+
+    return pack;
+  }
+}

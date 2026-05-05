@@ -1,0 +1,43 @@
+void main() {
+    var x = 10;
+    
+    if (x > 5) {
+        print("x is greater than 5");
+    } else if (x > 3) {
+        print("x is greater than 3");
+    } else {
+        print("x is small");
+    }
+    
+    var y = x > 5 ? "big" : "small";
+    
+    for (int i = 0; i < 3; i++) {
+        print("Loop $i");
+    }
+    
+    var items = [1, 2, 3];
+    for (var item in items) {
+        print("Item: $item");
+    }
+    
+    var count = 0;
+    while (count < 3) {
+        print("While $count");
+        count++;
+    }
+    
+    count = 0;
+    do {
+        print("Do while $count");
+        count++;
+    } while (count < 2);
+    
+    var value = 1;
+    switch (value) {
+        case 1 => print("One"),
+        case 2 => print("Two"),
+        _ => print("Other"),
+    }
+    
+    print("Control flow working");
+}

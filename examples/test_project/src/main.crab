@@ -1,0 +1,19 @@
+void main() {
+    String? maybe = null;
+    String definitely = maybe ?? "default";
+    
+    String? other;
+    other ??= "assigned";
+    
+    int? num = 42;
+    var result = num?.toString();
+    
+    String nonNull = "value";
+    String forced = nonNull;
+    
+    if (maybe != null) {
+        print(maybe);
+    }
+    
+    print("Null safety working");
+}

@@ -1,0 +1,39 @@
+extension StringUtils on String {
+    String capitalize() {
+        if (isEmpty) return this;
+        return "${this[0].toUpperCase()}${substring(1)}";
+    }
+    
+    bool get isEmpty => length == 0;
+}
+
+extension IntUtils on int {
+    bool isEven() => this % 2 == 0;
+    bool isOdd() => !isEven();
+}
+
+mixin Logger {
+    void log(String message) {
+        print("[LOG] $message");
+    }
+}
+
+class Service with Logger {
+    void doWork() {
+        log("Working...");
+    }
+}
+
+void main() {
+    var name = "alice";
+    print(name.capitalize());
+    
+    var num = 42;
+    print("Is even: ${num.isEven()}");
+    print("Is odd: ${num.isOdd()}");
+    
+    var service = Service();
+    service.doWork();
+    
+    print("Extensions and mixins working");
+}

@@ -1,0 +1,27 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  nightly-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-action@nightly
+
+      - name: Build with nightly
+        run: cd crab.rs && cargo +nightly build --workspace
+
+      - name: Test with nightly
+        run: cd crab.rs && cargo +nightly test --workspace
+
+      - name: Check for upstream breakage
+        run: cd crab.rs && cargo update && cargo build --workspace

@@ -1,0 +1,123 @@
+import "../models/order.crab";
+import "../models/cookie.crab";
+import "../models/customer.crab";
+
+class OrderBuilder {
+  String? _orderId;
+  String? _customerId;
+  List<OrderItem> _items;
+  DateTime? _scheduledFor;
+  String? _notes;
+
+  OrderBuilder() {
+    _items = [];
+  }
+
+  OrderBuilder orderId(String id) {
+    _orderId = id;
+    return this;
+  }
+
+  OrderBuilder customerId(String id) {
+    _customerId = id;
+    return this;
+  }
+
+  OrderBuilder addCookie(Cookie cookie, int quantity) {
+    _items.add(OrderItem(cookie, quantity, cookie.price));
+    return this;
+  }
+
+  OrderBuilder addItem(String cookieId, String cookieName, double price, int quantity) {
+    var cookie = Cookie(cookieId, cookieName, price, 0);
+    _items.add(OrderItem(cookie, quantity, price));
+    return this;
+  }
+
+  OrderBuilder scheduledFor(DateTime when) {
+    _scheduledFor = when;
+    return this;
+  }
+
+  OrderBuilder notes(String note) {
+    _notes = note;
+    return this;
+  }
+
+  Result<Order, String> build() {
+    if (_orderId == null) {
+      return Err("Order ID is required");
+    }
+    if (_customerId == null) {
+      return Err("Customer ID is required");
+    }
+    if (_items.isEmpty) {
+      return Err("At least one item is required");
+    }
+
+    var order = Order(_orderId!, _customerId!);
+    for (var item in _items) {
+      order.addItem(item.cookie, item.quantity);
+    }
+
+    return Ok(order);
+  }
+}
+
+class CustomerBuilder {
+  String? _id;
+  String? _name;
+  String? _email;
+  bool _premium = false;
+  int _initialPoints = 0;
+
+  CustomerBuilder id(String id) {
+    _id = id;
+    return this;
+  }
+
+  CustomerBuilder name(String name) {
+    _name = name;
+    return this;
+  }
+
+  CustomerBuilder email(String email) {
+    _email = email;
+    return this;
+  }
+
+  CustomerBuilder premium() {
+    _premium = true;
+    return this;
+  }
+
+  CustomerBuilder withLoyaltyPoints(int points) {
+    _initialPoints = points;
+    return this;
+  }
+
+  Result<Customer, String> build() {
+    if (_id == null) {
+      return Err("Customer ID is required");
+    }
+    if (_name == null || _name!.isEmpty) {
+      return Err("Customer name is required");
+    }
+    if (_email == null || !_email!.contains("@")) {
+      return Err("Valid email is required");
+    }
+
+    Customer customer;
+    if (_premium) {
+      var premium = PremiumCustomer(_id!, _name!, _email!);
+      if (_initialPoints > 0) {
+        premium.addLoyaltyPoints(_initialPoints);
+      }
+      customer = premium;
+    } else {
+      customer = Customer(_id!, _name!, _email!);
+    }
+
+    return Ok(customer);
+  }
+}

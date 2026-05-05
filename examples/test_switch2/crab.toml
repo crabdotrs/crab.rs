@@ -1,0 +1,9 @@
+[package]
+name = "test_switch2"
+version = "0.1.0"
+edition = "2024"
+authors = ["crabdotrs"]
+description = "Test switch in class method"
+license = "MIT"
+
+[dependencies]

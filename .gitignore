@@ -1,0 +1,40 @@
+# Rust build artifacts
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Crab build artifacts
+.crab_cache/
+*.crab.exe
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Next.js / documentation
+.next/
+out/
+.source/
+
+# Editor directories and files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+*.log
+coverage/
+
+# OS
+Thumbs.db

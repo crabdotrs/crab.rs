@@ -1,0 +1,75 @@
+import "../models/customer.crab";
+import "../repositories/customer_repository.crab";
+
+class CustomerService {
+  MemoryCustomerRepository _repository;
+
+  CustomerService(MemoryCustomerRepository repository) {
+    _repository = repository;
+  }
+
+  Result<Customer, String> createCustomer(String id, String name, String email, bool premium) {
+    if (name.isEmpty) {
+      return Err("Name cannot be empty");
+    }
+    if (!email.contains("@")) {
+      return Err("Invalid email format");
+    }
+
+    Customer customer;
+    if (premium) {
+      customer = PremiumCustomer(id, name, email);
+    } else {
+      customer = Customer(id, name, email);
+    }
+
+    return _repository.save(customer);
+  }
+
+  Result<Customer, String> getCustomer(String id) {
+    return _repository.findById(id);
+  }
+
+  List<Customer> listAllCustomers() {
+    return _repository.findAll();
+  }
+
+  List<PremiumCustomer> listPremiumCustomers() {
+    return _repository.getPremiumCustomers();
+  }
+
+  Result<void, String> upgradeToPremium(String id) {
+    var result = _repository.findById(id);
+    switch (result) {
+      case Err e => return Err(e);
+      case Ok c => {
+        var customer = c.unwrap();
+        if (customer is PremiumCustomer) {
+          return Err("Customer is already premium");
+        }
+
+        var premium = PremiumCustomer(customer.id, customer.name, customer.email);
+        return _repository.save(premium);
+      }
+    }
+  }
+
+  Result<void, String> addLoyaltyPoints(String id, int points) {
+    var result = _repository.findById(id);
+    switch (result) {
+      case Err e => return Err(e);
+      case Ok c => {
+        var customer = c.unwrap();
+        if (customer is PremiumCustomer) {
+          customer.addLoyaltyPoints(points);
+          return _repository.save(customer);
+        }
+        return Err("Only premium customers can earn loyalty points");
+      }
+    }
+  }
+
+  int getPremiumCustomerCount() {
+    return _repository.getPremiumCustomers().length;
+  }
+}
