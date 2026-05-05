@@ -28,7 +28,7 @@ cargo install --path crab-cli
 
 ### Hello World
 
-Create `hello.crab`:
+run `crab new hello`:
 
 ```crab
 Future<void> main() async {
@@ -43,7 +43,7 @@ Build and run:
 
 ```bash
 crab build
-./target/release/hello
+.crab_cache/target/debug/hello
 ```
 
 ## Example: Cookie Shop API (Not Commpleted </3 figured i had a bad decision will take 10-15 hours)
