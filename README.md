@@ -23,7 +23,7 @@ Crab is a systems programming language with Dart-like syntax that transpiles to 
 ```bash
 git clone https://github.com/crabdotrs/crab.rs ~/.crab
 cd ~/.crab/crab.rs
-cargo install --path .
+cargo install --path crab-cli
 ```
 
 ### Hello World
