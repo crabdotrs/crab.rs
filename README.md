@@ -182,6 +182,12 @@ Crab/
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+## Support
+for some geo problems also about some other problems i can accept only crypto
+btc -> bc1qrv5g0x32j5a0wkjht6tlfjutmks40hnt9sf2cv
+eth -> 0x29150EbB5fdFE3a750e748f00EA1347B4eFAdEA5
+sol -> 3oBsBjbtVBQcsCcHdycRkwRy5P3msV3YPVT3MJpPmHTe
+
 ## License
 
 MIT License - Copyright (c) 2026 crabdotrs
